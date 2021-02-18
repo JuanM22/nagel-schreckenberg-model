@@ -19,7 +19,7 @@ class Vehicle:
         self.speed = min(self.speed, gap)
     
     def _ruleThree(self):
-        add = 1 + 2
+        add = 1 + 3
     
     def _ruleFour(self):
         self.newPos += self.speed
