@@ -29,7 +29,6 @@ s = sched.scheduler(time.time, time.sleep)
 def startSimulation(sc):
     if(lane.occupiedCells < lane.vehicleQuantity):
         createVehicle() # Crea un nuevo vehiculo
-    #########################################################################
     lane.updateLane()
     printLand()
     s.enter(5, 1, startSimulation, (sc,))
