@@ -8,7 +8,7 @@ v = [1,2,3,4,5,6]
 
 def createVehicle():
     if(lane.vehicleList[0] == None):
-        vehicle = Vehicle(0,0)
+        vehicle = Vehicle(0,0, 'V'+str(v.pop()))
         lane.addVehicleToLane(vehicle)
         lane.occupiedCells +=1
     
@@ -18,7 +18,7 @@ def printLand():
     data = ''
     for vehicle in lane.vehicleList:
         if(vehicle!=None):
-            data += str(vehicle.speed)+' '
+            data += str(vehicle.name)+' '
         else:
             data += '0 '
     print(data, end='\r')

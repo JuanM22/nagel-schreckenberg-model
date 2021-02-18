@@ -1,15 +1,16 @@
 class Vehicle:
 
-    def __init__(self,initSpeed, initPosition):
+    def __init__(self,initSpeed, initPosition, name):
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
         self.checked = False
+        self.name = name
 
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
         self._ruleTwo(gap)
-        self._ruleOne(gap,maxSpeed)
+        self._ruleThree()
         self._ruleFour()
 
     def _ruleOne(self, maxSpeed):

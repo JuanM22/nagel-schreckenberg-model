@@ -18,7 +18,6 @@ class Lane:
             self.vehicleList[0] = vehicle
 
     def updateLane(self):
-        self.carCounter()
         for vehicle in self.vehicleList:
             if(vehicle != None):
                 vehicle.updatePosition(self.checkGap(vehicle),self.maxSpeed)
@@ -30,8 +29,6 @@ class Lane:
                         self.vehicleList[vehicle.newPos] = vehicle
                         vehicle.currentPos = vehicle.newPos
                         vehicle.checked = True
-                    # else:
-                    #     self.occupiedCells -=1               
         self.restartVehicleValues()
 
 
