@@ -9,7 +9,7 @@ class Vehicle:
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
         self._ruleTwo(gap)
-        #self._ruleOne(gap,maxSpeed)
+        self._ruleOne(gap,maxSpeed)
         self._ruleFour()
 
     def _ruleOne(self, maxSpeed):
