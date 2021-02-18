@@ -12,8 +12,6 @@ def createVehicle():
         lane.addVehicleToLane(vehicle)
         lane.occupiedCells +=1
     
-
-
 def printLand():
     data = ''
     for vehicle in lane.vehicleList:

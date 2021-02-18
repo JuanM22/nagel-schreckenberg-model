@@ -1,11 +1,14 @@
+import random
+
 class Vehicle:
 
-    def __init__(self,initSpeed, initPosition, name):
+    def __init__(self,initSpeed, initPosition, name, brakeProbability):
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
         self.checked = False
         self.name = name
+        self.brakeProbability = brakeProbability
 
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
@@ -20,7 +23,8 @@ class Vehicle:
         self.speed = min(self.speed, gap)
     
     def _ruleThree(self):
-        add = 1 + 3
+        if(self.speed > 0 and random.random() <= self.brakeProbability):
+            self.speed -= 1
     
     def _ruleFour(self):
         self.newPos += self.speed
