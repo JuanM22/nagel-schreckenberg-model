@@ -43,12 +43,6 @@ class Lane:
                     end +=1
                 else:
                     break
-                # i = len(self.vehicleList)
-        # gap = 0
-        # if(end == 0):
-        #     gap = len(self.vehicleList) - 1
-        # else:
-        #     gap = end
         return end
 
 
