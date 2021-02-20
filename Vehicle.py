@@ -27,5 +27,6 @@ class Vehicle:
             self.speed -= 1
     
     def _ruleFour(self):
+        self.newPos = self.currentPos
         self.newPos += self.speed
 

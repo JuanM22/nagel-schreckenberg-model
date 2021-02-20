@@ -10,7 +10,7 @@ class Lane:
         self._createInitLane()
 
     def _createInitLane(self):
-        for i in range(0,10):
+        for i in range(0,8):
             self.vehicleList.append(None) # Lista vacía
 
     def addVehicleToLane(self, vehicle):
@@ -35,17 +35,21 @@ class Lane:
     def checkGap(self, vehicle):
         start = self.vehicleList.index(vehicle) + 1
         end = 0
-        for i in range(start, len(self.vehicleList)):
-            if(self.vehicleList.__getitem__(i) != None):
-                end = i
-                # i = len(self.vehicleList)
-                break
-        gap = 0
-        if(end == 0):
-            gap = len(self.vehicleList) - 1
+        if(start == len(self.vehicleList)):
+            end = len(self.vehicleList)
         else:
-            gap = end - 1
-        return gap
+            for i in range(start, len(self.vehicleList)):
+                if(self.vehicleList.__getitem__(i) == None):
+                    end +=1
+                else:
+                    break
+                # i = len(self.vehicleList)
+        # gap = 0
+        # if(end == 0):
+        #     gap = len(self.vehicleList) - 1
+        # else:
+        #     gap = end
+        return end
 
 
     def carCounter(self):
