@@ -33,6 +33,7 @@ class Lane:
 
 
     def checkGap(self, vehicle):
+        print('hola')
         start = self.vehicleList.index(vehicle) + 1
         end = 0
         for i in range(start, len(self.vehicleList)):
