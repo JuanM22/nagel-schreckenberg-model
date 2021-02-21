@@ -1,7 +1,6 @@
 from Vehicle import Vehicle
 from Lane import Lane
 import sched
-import time
 import random
 import sys
 import pygame
@@ -16,41 +15,27 @@ blue = [153, 255, 255]
 pygame.display.init()
 screen = pygame.display.set_mode(size)
 
-car = pygame.image.load("./screen/car.jpg")
-carImageSize = car.get_size()
-width = carImageSize[0]
-height = carImageSize[1]
-
-x = 50
+x = 55
 y = 30
 
 screen.fill(white)
 ######################################
 
-lane = Lane(6, 2)
-v = [1, 2, 3, 4, 5, 6]
+lane = Lane(15, 5)
 brakeProbability = 0.3
 
-v1 = Vehicle(2, 0, brakeProbability, car, x, y)
-x += width+10
-v2 = Vehicle(1, 2, brakeProbability, car, x, y)
-x += width+10
-v3 = Vehicle(1, 5, brakeProbability, car, x, y)
-x += width+10
-v4 = Vehicle(0, 6, brakeProbability, car, x, y)
-
-lane.vehicleList[0] = v1
-lane.vehicleList[2] = v2
-lane.vehicleList[5] = v3
-lane.vehicleList[6] = v4
-
+carImages = ['./screen/car.jpg','./screen/car2.jpg','./screen/car3.jpg','./screen/car4.jpg']
+width = 45
+height = 20
 
 def createVehicle():
     if(lane.vehicleList[0] == None):
-        vehicle = Vehicle(0, 0, 'V'+str(v.pop()), brakeProbability)
+        imgPos = random.randint(0,3)
+        car = pygame.image.load(carImages[imgPos])
+        car.convert()
+        vehicle = Vehicle(0, 0, brakeProbability, car, x, y)
         lane.addVehicleToLane(vehicle)
         lane.occupiedCells += 1
-
 
 # def printLand():
 #     data = ''
@@ -61,52 +46,72 @@ def createVehicle():
 #             data += '0 '
 #     print(data, end='\r')
 
-# printLand()
+clock = pygame.time.Clock()
 
-s = sched.scheduler(time.time, time.sleep)
+while 1:
 
-
-def startSimulation(sc):
-    # if(lane.occupiedCells < lane.vehicleQuantity):
-    #     createVehicle() # Crea un nuevo vehiculo
-    # lane.updateLane()
+    if(lane.occupiedCells < lane.vehicleQuantity):
+        createVehicle() # Crea un nuevo vehiculo
     ############################################################
-    ### 123 px por carril ###
     pygame.event.pump()
-    # x, y, width, height
-    pygame.draw.rect(screen, black, [40, 20, 1316 - width, 40], 1)
-    # pygame.draw.rect(screen,black,[40, 70, 1316 - width,40],1) # x, y, width, height
+    pygame.draw.rect(screen, black, [50, 20, 1315 - width, 40], 2)
+
+    xline = 105
+    for i in range(0, 23):
+        pygame.draw.line(screen, black, [xline, 20], [xline, 60])
+        xline += 55
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
 
-    # if(x >= (1316-width)):
-    #     x = 50
-    #     y = 30
-    # else:
-    #     x += 1
-
-    # if(x >= 500 and x <= 550):
-    #     y+=1
-
-    for vehicle in lane.vehicleList:
+    beforePos = []
+    for i in range(0, len(lane.vehicleList)):
+        vehicle = lane.vehicleList[i]
         if(vehicle != None):
-            rect = vehicle.image.get_rect()
-            screen.blit(vehicle.image, [vehicle.xPos, vehicle.yPos])
-            vehicle.xPos += vehicle.image.get_size()[0] + 10
-    
-    # rect = lane.vehicleList[0].image.get_rect()
-    # screen.blit(lane.vehicleList[0].image, [lane.vehicleList[0].xPos, lane.vehicleList[0].yPos])
-    # rect.x += lane.vehicleList[0].image.get_size()[0] + 10
+            beforePos.append([55 * (vehicle.currentPos + 1), False])
 
-    pygame.display.flip()
+    lane.updateLane()
+
+    afterPos = []
+    for i in range(0, len(lane.vehicleList)):
+        vehicle = lane.vehicleList[i]
+        if(vehicle != None):
+            afterPos.append([vehicle.xPos, i])
+
+    counter = 0
+
+    if(len(beforePos) > len(afterPos)):
+        pos = len(beforePos) - 1
+        beforePos.remove(beforePos[pos])
+
+    while(counter < len(beforePos)):
+        pygame.draw.rect(screen, black, [50, 20, 1315 - width, 40], 2)
+
+        xline = 105
+        for i in range(0, 23):
+            pygame.draw.line(screen, black, [xline, 20], [xline, 60])
+            xline += 55
+
+
+        for i in range(0, len(afterPos)):
+            if(beforePos[i][0] <= (afterPos[i][0]+0.5)):
+                beforePos[i][0] += 0.5
+            else:
+                if(not(beforePos[i][1])):
+                  counter += 1
+                  beforePos[i][1] = True
+
+        images = []
+        for i in range(0, len(afterPos)):
+            position = afterPos[i][1]
+            vehicle = lane.vehicleList[position]
+            images.append([vehicle.image, [beforePos[i][0], vehicle.yPos]])
+
+        screen.blits(images)
+        clock.tick(500)
+        pygame.display.flip()
+        screen.fill(white)
+        images.clear()
+
     screen.fill(white)
-    # time.sleep(0.005)
-    ############################################################
-    # printLand()
-    s.enter(2, 1, startSimulation, (sc,))
-
-
-s.enter(1, 1, startSimulation, (s,))
-s.run()

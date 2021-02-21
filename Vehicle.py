@@ -31,4 +31,5 @@ class Vehicle:
     def _ruleFour(self):
         self.newPos = self.currentPos
         self.newPos += self.speed
-
+        if(self.newPos < 23):
+            self.xPos = 55 * (self.newPos + 1)
