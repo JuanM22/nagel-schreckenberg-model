@@ -13,10 +13,11 @@ red = [255, 0, 0]
 blue = [153, 255, 255]
 
 pygame.display.init()
+pygame.display.set_caption('Nagel-Schreckenberg Model')
 screen = pygame.display.set_mode(size)
 
 x = 55
-y = 30
+y = 20
 
 screen.fill(white)
 ######################################
