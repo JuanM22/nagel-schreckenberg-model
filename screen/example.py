@@ -10,9 +10,7 @@ pygame.display.init()
 screen = pygame.display.set_mode(size)
 
 
-pygame.font.init() # you have to call this at the start, 
-                   # if you want to use this module.
-
+pygame.font.init()
 myfont = pygame.font.SysFont('Arial', 12)
 textsurface = myfont.render('V1', False, (0, 0, 0), blue)
 

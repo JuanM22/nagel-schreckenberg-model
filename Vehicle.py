@@ -2,7 +2,7 @@ import random, pygame
 
 class Vehicle:
 
-    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, namePos):
+    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name):
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
@@ -11,7 +11,7 @@ class Vehicle:
         self.image = image
         self.xPos = xPos
         self.yPos = yPos
-        self.namePos = namePos
+        self.name = name
 
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
@@ -32,5 +32,5 @@ class Vehicle:
     def _ruleFour(self):
         self.newPos = self.currentPos
         self.newPos += self.speed
-        if(self.newPos < 23):
-            self.xPos = 55 * (self.newPos + 1)
+        if(self.newPos < 16):
+            self.xPos = 80 * (self.newPos + 1)
