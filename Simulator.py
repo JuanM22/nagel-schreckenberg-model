@@ -151,4 +151,3 @@ while 1:
         images.clear()
     
     clock.tick(60)
-    clock.

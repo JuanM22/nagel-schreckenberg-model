@@ -51,7 +51,6 @@ class Lane:
                     break
         return end
 
-
     def carCounter(self):
         counter = 0
         for vehicle in self.vehicleList:
