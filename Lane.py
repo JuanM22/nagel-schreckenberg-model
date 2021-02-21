@@ -7,6 +7,8 @@ class Lane:
         self.vehicleQuantity = vehicleQuantity
         self.occupiedCells = 0
         self.vehicleList = []
+        self.vehicleNames = []
+        self.setVehicleNames()
         self._createInitLane()
 
     def _createInitLane(self):
@@ -18,6 +20,7 @@ class Lane:
             self.vehicleList[0] = vehicle
 
     def updateLane(self):
+        self.carCounter()
         for vehicle in self.vehicleList:
             if(vehicle != None):
                 vehicle.updatePosition(self.checkGap(vehicle),self.maxSpeed)
@@ -31,6 +34,7 @@ class Lane:
                         vehicle.checked = True
                     else:
                         self.occupiedCells -=1
+                        self.vehicleNames[vehicle.namePos][1] = False
         self.restartVehicleValues()
 
 
@@ -53,9 +57,13 @@ class Lane:
         for vehicle in self.vehicleList:
             if(vehicle!=None):
                 counter+=1
-        return counter
+        self.occupiedCells = counter
 
     def restartVehicleValues(self):
         for vehicle in self.vehicleList:
             if(vehicle != None):
               vehicle.checked = False
+
+    def setVehicleNames(self):
+        for i in range(0, self.vehicleQuantity):
+            self.vehicleNames.append(['V'+str(i+1), False])

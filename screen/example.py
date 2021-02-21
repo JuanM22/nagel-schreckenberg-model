@@ -14,9 +14,7 @@ pygame.font.init() # you have to call this at the start,
                    # if you want to use this module.
 
 myfont = pygame.font.SysFont('Arial', 12)
-
 textsurface = myfont.render('V1', False, (0, 0, 0), blue)
-
 
 car = pygame.image.load("car.jpg", "imagen1")
 
@@ -34,6 +32,8 @@ screen.fill(white)
 clock = pygame.time.Clock()
 
 while 1:
+
+    # pygame.display.flip()
 
     ### 123 px por carril ###
     pygame.event.pump()
