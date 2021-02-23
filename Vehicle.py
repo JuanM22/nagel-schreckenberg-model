@@ -2,7 +2,7 @@ import random, pygame
 
 class Vehicle:
 
-    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name):
+    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name, imgAssigned):
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
@@ -12,6 +12,7 @@ class Vehicle:
         self.xPos = xPos
         self.yPos = yPos
         self.name = name
+        self.imgAssigned = imgAssigned
 
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
