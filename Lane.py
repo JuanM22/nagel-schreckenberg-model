@@ -1,8 +1,10 @@
 import numpy as np
+import pygame
 
-class Lane:
+class Lane(pygame.sprite.Group):
 
     def __init__(self,vehicleQuantity, maxSpeed):
+        pygame.sprite.Group.__init__(self)
         self.maxSpeed = maxSpeed
         self.vehicleQuantity = vehicleQuantity
         self.occupiedCells = 0

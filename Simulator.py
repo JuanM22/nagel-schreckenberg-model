@@ -24,34 +24,56 @@ pygame.font.init()
 myfont = pygame.font.SysFont('Arial', 12)
 tableFont = pygame.font.SysFont('Arial', 15)
 
-x = 80
-y = (resolution.current_h * 15.8)/100
+laneList = []
 
-lane = Lane(28, 5)
+for _ in range(0,10):
+    lane = Lane(28, 5)
+    laneList.append(lane)
+########################################################
 brakeProbability = 0.3
+########################################################
+
+class LaneSprite(pygame.sprite.Sprite):
+    
+    def __init__(self,image, xPos, yPos):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = image.get_rect()
+        self.rect.x = xPos
+        self.rect.y = yPos
+########################################################
 
 laneBackGround = pygame.image.load('./screen/nagelModelLane.png')
+laneX = 70
+laneY = (resolution.current_h * 15)/100
+
+laneSprite = pygame.sprite.Group()
+
+for _ in range(0, 10):
+    laneSprite1 = LaneSprite(laneBackGround,laneX, laneY)
+    laneY += 40
+    laneSprite.add(laneSprite1)
+
+########################################################
 carImages = ['./screen/car1.png','./screen/car2.png','./screen/car3.png','./screen/car4.png','./screen/car5.png']
 width = 70
 height = 50
+########################################################
 
-################################
-carSprite = pygame.sprite.Group()
-################################
 
-def createVehicle():
+def createVehicle(lane, x, y):
     if(lane.vehicleList[0] == None):
         imgPos = random.randint(0,4)
         car = pygame.image.load(carImages[imgPos])
         car = pygame.transform.scale(car, (38, 28))
         #########################################################
-        vehicleData = setVehicleName()
+        vehicleData = setVehicleName(lane)
         car.blit(vehicleData[0],(0,0))
         vehicle = Vehicle(0, 0, brakeProbability, car, x, y, vehicleData[1]) ### Ya tengo nombre ###
         lane.addVehicleToLane(vehicle)
-        carSprite.add(vehicle)
+        lane.add(vehicle)
 
-def setVehicleName():
+def setVehicleName(lane):
     flag = False
     name = ''
     namePos = 0
@@ -65,7 +87,7 @@ def setVehicleName():
 
 clock = pygame.time.Clock()
 
-table = pygame.Surface([200, 25 * (lane.vehicleQuantity + 1)])
+# table = pygame.Surface([200, 25 * (lane.vehicleQuantity + 1)])
 buttons = pygame.Surface([resolution.current_w, (resolution.current_h*10)/100])
 
 def renderButtonTable():
@@ -79,46 +101,50 @@ def renderButtonTable():
     buttons.blit(buttonsText, [(resolution.current_w * 5)/100, (boardX*10)/100])
     backgroundImg.blit(buttons, [0, (resolution.current_h*2)/100])
 
-def renderTable():
-    table.fill(black)
-    x = 0
-    y = 0
-    cellWidth = 100
-    ########### HEADER ###########
-    pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
-    pygame.draw.rect(table, red, [x+100, y, cellWidth, cellWidth/4], 1)
-    leftCol = tableFont.render('Car', False, green)
-    rightCol = tableFont.render('Speed', False, green)
-    table.blit(leftCol, [(x + 40), (y + 5)])
-    table.blit(rightCol, [(x + 130), (y + 5)])
-    y = 25
-    ##############################
-    for i in range(0, lane.vehicleQuantity):
-        pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
-        pygame.draw.rect(table, red, [x + 100, y, cellWidth, cellWidth/4], 1)
-        strName = lane.vehicleNames[i][0]
-        speedIndex = -1
+# def renderTable():
+#     table.fill(black)
+#     x = 0
+#     y = 0
+#     cellWidth = 100
+#     ########### HEADER ###########
+#     pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
+#     pygame.draw.rect(table, red, [x+100, y, cellWidth, cellWidth/4], 1)
+#     leftCol = tableFont.render('Car', False, green)
+#     rightCol = tableFont.render('Speed', False, green)
+#     table.blit(leftCol, [(x + 40), (y + 5)])
+#     table.blit(rightCol, [(x + 130), (y + 5)])
+#     y = 25
+#     ##############################
+#     for i in range(0, lane.vehicleQuantity):
+#         pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
+#         pygame.draw.rect(table, red, [x + 100, y, cellWidth, cellWidth/4], 1)
+#         strName = lane.vehicleNames[i][0]
+#         speedIndex = -1
 
-        for j in range(0, lane.vehicleQuantity):
-            vehicle = lane.vehicleList[j]
-            if(vehicle != None):
-                if(lane.vehicleList[j].name == strName):
-                    speedIndex = j    
-                    break
+#         for j in range(0, lane.vehicleQuantity):
+#             vehicle = lane.vehicleList[j]
+#             if(vehicle != None):
+#                 if(lane.vehicleList[j].name == strName):
+#                     speedIndex = j    
+#                     break
 
-        name = tableFont.render(strName, False, green)
-        strSpeed = str(lane.vehicleList[speedIndex].speed) if(speedIndex != -1) else 'N/A'
-        speed = tableFont.render(strSpeed, False, green)
-        table.blit(name,[(x + 40),(y + 5)])
-        table.blit(speed,[(x + 140),(y + 5)])
-        y+=(cellWidth/4)
-    ###############################
-    backgroundImg.blit(table, [50, (resolution.current_h*30)/100])
+#         name = tableFont.render(strName, False, green)
+#         strSpeed = str(lane.vehicleList[speedIndex].speed) if(speedIndex != -1) else 'N/A'
+#         speed = tableFont.render(strSpeed, False, green)
+#         table.blit(name,[(x + 40),(y + 5)])
+#         table.blit(speed,[(x + 140),(y + 5)])
+#         y+=(cellWidth/4)
+#     ###############################
+#     backgroundImg.blit(table, [50, (resolution.current_h*30)/100])
 
 pause = False
 state = 1
 
-def _chargeBeforeAndAfter():
+def validateLane(lane, x, y):
+    if(lane.occupiedCells < lane.vehicleQuantity):
+                createVehicle(lane,x,y) # Crea un nuevo vehiculo
+
+def _chargeBeforeAndAfter(lane):
     arr = []
     for i in range(0, len(lane.vehicleList)):
         vehicle = lane.vehicleList[i]
@@ -152,31 +178,43 @@ while 1:
 
         if(not(pause)):
 
-            if(lane.occupiedCells < lane.vehicleQuantity):
-                createVehicle() # Crea un nuevo vehiculo
+            afterPosList = []
+            
+            x = 80
+            y = (resolution.current_h * 15.8)/100
 
-            lane.updateLane()
-            afterPos = _chargeBeforeAndAfter()
+            for lane in laneList:
+                validateLane(lane, x, y)
+                lane.updateLane()
+                afterPosList.append(_chargeBeforeAndAfter(lane))
+                y += 40
 
             # renderTable()
+            laneCounter = 0
 
-            counter = 0
+            for arr in afterPosList:
 
-            while(counter < len(afterPos)):
-        
-                for i in range(0, len(afterPos)):
-                    vehicle = afterPos[i][0]
-                    if(not(afterPos[i][1])):
-                        if(vehicle.rect.x == vehicle.xPos):
-                            counter += 1
-                            afterPos[i][1] = True
+                counter = 0
 
-                screen.blit(backgroundImg, [0,0])
-                screen.blit(laneBackGround, [70,(resolution.current_h * 15)/100])
-                carSprite.draw(screen)
-                carSprite.update()
-                pygame.display.update()
-                screen.fill(white)
-                clock.tick(350)
+                afterPos = arr
+
+                while(counter < len(afterPos)):
+            
+                    for i in range(0, len(afterPos)):
+                        vehicle = afterPos[i][0]
+                        if(not(afterPos[i][1])):
+                            if(vehicle.rect.x == vehicle.xPos):
+                                counter += 1
+                                afterPos[i][1] = True
+
+                    screen.blit(backgroundImg, [0,0])
+                    laneSprite.draw(screen)
+                    laneSprite.update()
+                    for lane in laneList:
+                        lane.draw(screen)
+                        lane.update()
+                    pygame.display.update()
+                    screen.fill(white)
+                    clock.tick(350)
                 
-    
+                laneCounter+=1
