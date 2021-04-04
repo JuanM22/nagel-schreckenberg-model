@@ -1,8 +1,9 @@
 import random, pygame
 
-class Vehicle:
+class Vehicle(pygame.sprite.Sprite):
 
-    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name, car_rect):
+    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name):
+        pygame.sprite.Sprite.__init__(self)
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
@@ -12,7 +13,9 @@ class Vehicle:
         self.xPos = xPos
         self.yPos = yPos
         self.name = name
-        self.car_rect = car_rect
+        self.rect = image.get_rect()
+        self.rect.x = xPos
+        self.rect.y = yPos
 
     def updatePosition(self,gap, maxSpeed):
         self._ruleOne(maxSpeed)
@@ -33,5 +36,9 @@ class Vehicle:
     def _ruleFour(self):
         self.newPos = self.currentPos
         self.newPos += self.speed
-        if((self.newPos < 16) and (self.currentPos != self.newPos)):
-            self.xPos = 80 * (self.newPos + 1)
+        if((self.newPos < 28) and (self.currentPos != self.newPos)):
+            self.xPos += (43 * self.speed)
+
+    def update(self):
+        if(self.rect.x < self.xPos):
+            self.rect.x += 1

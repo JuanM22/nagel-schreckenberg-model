@@ -25,9 +25,9 @@ myfont = pygame.font.SysFont('Arial', 12)
 tableFont = pygame.font.SysFont('Arial', 15)
 
 x = 80
-y = (resolution.current_h * 16.5)/100
+y = (resolution.current_h * 15.8)/100
 
-lane = Lane(5, 5)
+lane = Lane(28, 5)
 brakeProbability = 0.3
 
 laneBackGround = pygame.image.load('./screen/nagelModelLane.png')
@@ -35,18 +35,21 @@ carImages = ['./screen/car1.png','./screen/car2.png','./screen/car3.png','./scre
 width = 70
 height = 50
 
+################################
+carSprite = pygame.sprite.Group()
+################################
+
 def createVehicle():
     if(lane.vehicleList[0] == None):
         imgPos = random.randint(0,4)
         car = pygame.image.load(carImages[imgPos])
-        car_rect = car.get_rect()
-        car_rect.x = x
-        car_rect.y = y
+        car = pygame.transform.scale(car, (38, 28))
         #########################################################
         vehicleData = setVehicleName()
         car.blit(vehicleData[0],(0,0))
-        vehicle = Vehicle(0, 0, brakeProbability, car, x, y, vehicleData[1], car_rect) ### Ya tengo nombre ###
+        vehicle = Vehicle(0, 0, brakeProbability, car, x, y, vehicleData[1]) ### Ya tengo nombre ###
         lane.addVehicleToLane(vehicle)
+        carSprite.add(vehicle)
 
 def setVehicleName():
     flag = False
@@ -115,12 +118,12 @@ def renderTable():
 pause = False
 state = 1
 
-def _chargeBeforeAndAfter(type):
+def _chargeBeforeAndAfter():
     arr = []
     for i in range(0, len(lane.vehicleList)):
         vehicle = lane.vehicleList[i]
         if(vehicle != None):
-            arr.append([vehicle.xPos, i, False])
+            arr.append([vehicle,False])
     return arr
 
 
@@ -128,6 +131,7 @@ start = False
 renderButtonTable()
 screen.blit(backgroundImg, [0,0])
 pygame.display.flip()
+
 
 while 1:
     
@@ -146,14 +150,13 @@ while 1:
 
     if(start):
 
-
         if(not(pause)):
 
             if(lane.occupiedCells < lane.vehicleQuantity):
                 createVehicle() # Crea un nuevo vehiculo
 
             lane.updateLane()
-            afterPos = _chargeBeforeAndAfter('after')
+            afterPos = _chargeBeforeAndAfter()
 
             # renderTable()
 
@@ -162,30 +165,18 @@ while 1:
             while(counter < len(afterPos)):
         
                 for i in range(0, len(afterPos)):
-
-                    if(not(afterPos[i][2])): ## Booleano ##
-                        vehicle = lane.vehicleList[afterPos[i][1]]
-                        car_rect = vehicle.car_rect ## Vehiculo
-                        if(car_rect.x < afterPos[i][0]):
-                            car_rect.x += 1
-                        else:
+                    vehicle = afterPos[i][0]
+                    if(not(afterPos[i][1])):
+                        if(vehicle.rect.x == vehicle.xPos):
                             counter += 1
-                            afterPos[i][2] = True
+                            afterPos[i][1] = True
 
-                images = []
-                images.append([laneBackGround,[70,(resolution.current_h * 15)/100]])
-
-                for i in range(0, len(afterPos)):
-                    position = afterPos[i][1]
-                    vehicle = lane.vehicleList[position]
-                    car_rect = vehicle.car_rect
-                    images.append([vehicle.image, [car_rect.x, car_rect.y]])
-
-                backgroundImg.blits(images)
                 screen.blit(backgroundImg, [0,0])
-                pygame.display.flip()
-                images.clear()
-                clock.tick(250)
-
-
+                screen.blit(laneBackGround, [70,(resolution.current_h * 15)/100])
+                carSprite.draw(screen)
+                carSprite.update()
+                pygame.display.update()
+                screen.fill(white)
+                clock.tick(350)
+                
     
