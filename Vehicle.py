@@ -16,8 +16,10 @@ class Vehicle(pygame.sprite.Sprite):
         self.rect = image.get_rect()
         self.rect.x = xPos
         self.rect.y = yPos
+        self.animation = True
 
     def updatePosition(self,gap, maxSpeed):
+        self.animation = True
         self._ruleOne(maxSpeed)
         self._ruleTwo(gap)
         self._ruleThree()
@@ -42,3 +44,5 @@ class Vehicle(pygame.sprite.Sprite):
     def update(self):
         if(self.rect.x < self.xPos):
             self.rect.x += 1
+        else:
+            self.animation = False

@@ -26,7 +26,7 @@ tableFont = pygame.font.SysFont('Arial', 15)
 
 laneList = []
 
-for _ in range(0,10):
+for _ in range(0,7):
     lane = Lane(28, 5)
     laneList.append(lane)
 ########################################################
@@ -49,7 +49,7 @@ laneY = (resolution.current_h * 15)/100
 
 laneSprite = pygame.sprite.Group()
 
-for _ in range(0, 10):
+for _ in range(0, 7):
     laneSprite1 = LaneSprite(laneBackGround,laneX, laneY)
     laneY += 40
     laneSprite.add(laneSprite1)
@@ -96,7 +96,6 @@ def renderButtonTable():
     #######################################################
     boardX = (buttons.get_size()[0]* 30) / 100
     boardY = buttons.get_size()[1]
-
     buttons.blit(title, [(resolution.current_w * 5)/100, (boardY*5)/100])
     buttons.blit(buttonsText, [(resolution.current_w * 5)/100, (boardX*10)/100])
     backgroundImg.blit(buttons, [0, (resolution.current_h*2)/100])
@@ -149,7 +148,7 @@ def _chargeBeforeAndAfter(lane):
     for i in range(0, len(lane.vehicleList)):
         vehicle = lane.vehicleList[i]
         if(vehicle != None):
-            arr.append([vehicle,False])
+            arr.append(vehicle.animation)
     return arr
 
 
@@ -157,6 +156,14 @@ start = False
 renderButtonTable()
 screen.blit(backgroundImg, [0,0])
 pygame.display.flip()
+
+#######################################################
+def isStillAnimate(afterPosList):
+    for lane in afterPosList:
+        if(True in lane):
+            return True
+    return False
+#######################################################
 
 
 while 1:
@@ -190,31 +197,18 @@ while 1:
                 y += 40
 
             # renderTable()
-            laneCounter = 0
 
-            for arr in afterPosList:
+            while(isStillAnimate(afterPosList)):
+                afterPosList = []
 
-                counter = 0
-
-                afterPos = arr
-
-                while(counter < len(afterPos)):
-            
-                    for i in range(0, len(afterPos)):
-                        vehicle = afterPos[i][0]
-                        if(not(afterPos[i][1])):
-                            if(vehicle.rect.x == vehicle.xPos):
-                                counter += 1
-                                afterPos[i][1] = True
-
-                    screen.blit(backgroundImg, [0,0])
-                    laneSprite.draw(screen)
-                    laneSprite.update()
-                    for lane in laneList:
-                        lane.draw(screen)
-                        lane.update()
-                    pygame.display.update()
-                    screen.fill(white)
-                    clock.tick(350)
+                screen.blit(backgroundImg, [0,0])
+                laneSprite.draw(screen)
+                laneSprite.update()
+                for lane in laneList:
+                    afterPosList.append(_chargeBeforeAndAfter(lane))
+                    lane.draw(screen)
+                    lane.update()
+                pygame.display.update()
+                screen.fill(white)
+                clock.tick(250)
                 
-                laneCounter+=1
