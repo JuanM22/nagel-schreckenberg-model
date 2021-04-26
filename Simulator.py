@@ -26,7 +26,7 @@ tableFont = pygame.font.SysFont('Arial', 15)
 
 laneList = []
 
-for _ in range(0,7):
+for _ in range(0,3):
     lane = Lane(28, 5)
     laneList.append(lane)
 ########################################################
@@ -49,7 +49,7 @@ laneY = (resolution.current_h * 15)/100
 
 laneSprite = pygame.sprite.Group()
 
-for _ in range(0, 7):
+for _ in range(0, 3):
     laneSprite1 = LaneSprite(laneBackGround,laneX, laneY)
     laneY += 40
     laneSprite.add(laneSprite1)
@@ -137,7 +137,7 @@ def renderButtonTable():
 #     backgroundImg.blit(table, [50, (resolution.current_h*30)/100])
 
 pause = False
-state = 1
+state = 0
 
 def validateLane(lane, x, y):
     if(lane.occupiedCells < lane.vehicleQuantity):
@@ -165,6 +165,7 @@ def isStillAnimate(afterPosList):
     return False
 #######################################################
 
+pygame.display.set_caption(appState[state])
 
 while 1:
     
@@ -176,10 +177,12 @@ while 1:
                 sys.exit()
             elif(event.key == pygame.K_SPACE):
                 pause = not(pause)
-                state = 2 if (state == 1) else 1
-                pygame.display.set_caption(appState[state])
+                state = 2 if(state == 1) else 1
             elif(event.key == pygame.K_s):
                 start = True
+                state = 1
+            pygame.display.set_caption(appState[state])
+
 
     if(start):
 
