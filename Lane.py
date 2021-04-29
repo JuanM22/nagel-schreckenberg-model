@@ -3,7 +3,7 @@ import pygame
 
 class Lane(pygame.sprite.Group):
 
-    def __init__(self,vehicleQuantity, maxSpeed):
+    def __init__(self,vehicleQuantity, maxSpeed, name):
         pygame.sprite.Group.__init__(self)
         self.maxSpeed = maxSpeed
         self.vehicleQuantity = vehicleQuantity
@@ -12,33 +12,10 @@ class Lane(pygame.sprite.Group):
         self.vehicleNames = []
         self.setVehicleNames()
         self._createInitLane()
+        self.name = name
 
     def _createInitLane(self):
-        for i in range(0,self.vehicleQuantity):
-            self.vehicleList.append(None) # Lista vacía
-
-    def addVehicleToLane(self, vehicle):
-        if(self.vehicleList.__getitem__(0) == None):
-            self.vehicleList[0] = vehicle
-
-    def updateLane(self):
-        for vehicle in self.vehicleList:
-            if(vehicle != None):
-                vehicle.updatePosition(self.checkGap(vehicle),self.maxSpeed)
-        for vehicle in self.vehicleList:
-            if(vehicle != None):
-                if(not(vehicle.checked)):
-                    self.vehicleList[vehicle.currentPos] = None
-                    if(vehicle.newPos < len(self.vehicleList)):
-                        self.vehicleList[vehicle.newPos] = vehicle
-                        vehicle.currentPos = vehicle.newPos
-                        vehicle.checked = True
-                    else:
-                        self.occupiedCells -=1
-                        nameIndex = self.vehicleNames.index(self.__getVehicleNameIndex(vehicle.name))
-                        self.vehicleNames[nameIndex][1] = False
-                        vehicle.kill()
-        self.restartVehicleValues()
+        self.vehicleList += [None] * self.vehicleQuantity # Lista vacía
 
     def checkGap(self, vehicle):
         start = self.vehicleList.index(vehicle) + 1
@@ -68,7 +45,6 @@ class Lane(pygame.sprite.Group):
     def setVehicleNames(self):
         for i in range(0, self.vehicleQuantity):
             self.vehicleNames.append(['V'+str(i+1), False])
-
     
     def __getVehicleNameIndex(self, name):
         data = []
