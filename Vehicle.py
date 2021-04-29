@@ -31,9 +31,11 @@ class Vehicle(pygame.sprite.Sprite):
     def multiLaneUpdatePosition(self, gap, gaps, maxSpeed, movement):
         self.animation = True
         self._ruleOne(maxSpeed)
+        currentLane = self.lane
         self._multiLaneRuleTwo(gap, gaps, maxSpeed, movement)
-        self._ruleThree()
-        self._ruleFour()
+        if(currentLane == self.lane):
+            self._ruleThree()
+            self._ruleFour()
 
     def _ruleOne(self, maxSpeed):
         self.speed = min(self.speed + 1, maxSpeed)
@@ -43,8 +45,7 @@ class Vehicle(pygame.sprite.Sprite):
 
     def _multiLaneRuleTwo(self, gap, gaps, maxSpeed, movement):
         self.move = 'X'
-        if(len(gaps) > 0):
-            # if(self.speed >= gap and movement != 'N/A'):
+        if(self.speed >= gap and movement != 'N/A'):
             if(gaps[0] == self.speed and gaps[1] == maxSpeed):
                 self.changeLane(movement)
             else:

@@ -73,7 +73,7 @@ height = 50
 def createVehicle(lane, x, y):
     if(lane.vehicleList[0] == None):
         imgPos = random.randint(0,4)
-        car = pygame.image.load(carImages[imgPos])
+        car = pygame.image.load(carImages[imgPos]).convert_alpha()
         car = pygame.transform.scale(car, (38, 28))
         #########################################################
         # vehicleData = setVehicleName(lane)
@@ -151,7 +151,7 @@ pause = False
 state = 0
 
 def validateLane(lane, x, y):
-    if(lane.occupiedCells < 6):
+    if(lane.occupiedCells < lane.vehicleQuantity):
         createVehicle(lane,x,y) # Crea un nuevo vehiculo
 
 def _chargeBeforeAndAfter(lane):
@@ -202,6 +202,8 @@ while 1:
             # renderTable()
             pushVehicles(y)
             road.update(mode)
+
+            print('listo')
 
             afterPosList = []
 
