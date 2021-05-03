@@ -2,4 +2,6 @@ lista = []
 
 lista += [None] * 5
 
-print(lista)
+print(len(lista))
+print(len(list(filter(None, lista))))
+print(len(lista))
