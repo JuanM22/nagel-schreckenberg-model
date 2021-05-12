@@ -2,7 +2,7 @@ import random, pygame
 
 class Vehicle(pygame.sprite.Sprite):
 
-    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, name, lane):
+    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, lane):
         pygame.sprite.Sprite.__init__(self)
         self.speed = initSpeed
         self.currentPos = initPosition
@@ -12,7 +12,6 @@ class Vehicle(pygame.sprite.Sprite):
         self.image = image
         self.xPos = xPos
         self.yPos = yPos
-        self.name = name
         self.rect = image.get_rect()
         self.rect.x = xPos
         self.rect.y = yPos
@@ -31,11 +30,9 @@ class Vehicle(pygame.sprite.Sprite):
     def multiLaneUpdatePosition(self, gap, gaps, maxSpeed, movement):
         self.animation = True
         self._ruleOne(maxSpeed)
-        currentLane = self.lane
         self._multiLaneRuleTwo(gap, gaps, maxSpeed, movement)
-        if(currentLane == self.lane):
-            self._ruleThree()
-            self._ruleFour()
+        self._ruleThree()
+        self._ruleFour()
 
     def _ruleOne(self, maxSpeed):
         self.speed = min(self.speed + 1, maxSpeed)
@@ -45,8 +42,8 @@ class Vehicle(pygame.sprite.Sprite):
 
     def _multiLaneRuleTwo(self, gap, gaps, maxSpeed, movement):
         self.move = 'X'
-        if(self.speed >= gap and movement != 'N/A'):
-            if(gaps[0] == self.speed and gaps[1] == maxSpeed):
+        if(self.speed >= gap and movement != 'N/A' and (self.currentPos + self.speed) < 27):
+            if(gaps[0] == maxSpeed and gaps[1] == self.speed):
                 self.changeLane(movement)
             else:
                 self._singleLaneRuleTwo(gap)
@@ -85,11 +82,11 @@ class Vehicle(pygame.sprite.Sprite):
             if(self.rect.y < self.yPos):
                 self.rect.y +=1
             else:
-                self.animation = False
-                self.move = ''
+                self.animation = (self.rect.x < self.xPos)
+                self.move = '' if(not(self.animation)) else 'X'
         elif(self.move == 'Y-'):
             if(self.rect.y > self.yPos):
                 self.rect.y -=1
             else:
-                self.animation = False
-                self.move = ''
+                self.animation = (self.rect.x < self.xPos)
+                self.move = '' if(not(self.animation)) else 'X'

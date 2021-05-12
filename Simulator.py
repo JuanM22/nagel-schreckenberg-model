@@ -1,12 +1,16 @@
 from Vehicle import Vehicle
 from Lane import Lane
 from Road import Road
-import sched, random, sys, pygame, time
+import sched
+import random
+import sys
+import pygame
+import time
 
 pygame.display.init()
 resolution = pygame.display.Info()
-pygame.display.set_mode((resolution.current_w, int((resolution.current_h * 90)/100)))
-
+pygame.display.set_mode(
+    (resolution.current_w, int((resolution.current_h * 90)/100)))
 
 vehicleQuantity = 3
 mode = 'multi'
@@ -17,12 +21,14 @@ black = [0, 0, 0]
 white = [255, 255, 255]
 red = [255, 0, 0]
 blue = [204, 255, 255]
-green = [0,255,0]
+green = [0, 255, 0]
 
 backgroundImg = pygame.image.load('./screen/background.jpg')
-backgroundImg = pygame.transform.scale(backgroundImg, [resolution.current_w, resolution.current_h])
+backgroundImg = pygame.transform.scale(
+    backgroundImg, [resolution.current_w, resolution.current_h])
 
-appState = ['Nagel-Schreckenberg Model','Nagel-Schreckenberg Model (Running)','Nagel-Schreckenberg Model (Paused)']
+appState = ['Nagel-Schreckenberg Model',
+            'Nagel-Schreckenberg Model (Running)', 'Nagel-Schreckenberg Model (Paused)']
 
 pygame.display.set_caption(appState[1])
 screen = pygame.display.set_mode(size)
@@ -34,24 +40,26 @@ road = Road()
 laneNames = []
 
 for i in range(vehicleQuantity):
-    laneNames.append("L"+ str(i))
+    laneNames.append("L" + str(i))
 
-for i in range(0,vehicleQuantity):
+for i in range(0, vehicleQuantity):
     lane = Lane(28, 5, laneNames[i])
     road.lanes.append(lane)
 ########################################################
 brakeProbability = 0.3
 ########################################################
 
+
 class LaneSprite(pygame.sprite.Sprite):
-    
-    def __init__(self,image, xPos, yPos):
+
+    def __init__(self, image, xPos, yPos):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = image.get_rect()
         self.rect.x = xPos
         self.rect.y = yPos
 ########################################################
+
 
 laneBackGround = pygame.image.load('./screen/nagelModelLane.png')
 laneX = 70
@@ -60,124 +68,97 @@ laneY = (resolution.current_h * 15)/100
 laneSprite = pygame.sprite.Group()
 
 for _ in range(0, vehicleQuantity):
-    laneSprite1 = LaneSprite(laneBackGround,laneX, laneY)
+    laneSprite1 = LaneSprite(laneBackGround, laneX, laneY)
     laneY += 40
     laneSprite.add(laneSprite1)
 
 ########################################################
-carImages = ['./screen/car1.png','./screen/car2.png','./screen/car3.png','./screen/car4.png','./screen/car5.png']
+carImages = ['./screen/car1.png', './screen/car2.png',
+             './screen/car3.png', './screen/car4.png', './screen/car5.png']
 width = 70
 height = 50
 ########################################################
+images = []
+
+
+def chargeImages():
+    for i in range(0, len(carImages)):
+        car = pygame.image.load(carImages[i]).convert_alpha()
+        car = pygame.transform.scale(car, (38, 28))
+        images.append(car)
+
+
+chargeImages()
+
 
 def createVehicle(lane, x, y):
     if(lane.vehicleList[0] == None):
-        imgPos = random.randint(0,4)
-        car = pygame.image.load(carImages[imgPos]).convert_alpha()
-        car = pygame.transform.scale(car, (38, 28))
+        imagePos = random.randint(0, 4)
+        car = images[imagePos].copy()
         #########################################################
-        # vehicleData = setVehicleName(lane)
-        # car.blit(vehicleData[0],(0,0))
-        #########################################################
-        vehicle = Vehicle(0, 0, brakeProbability, car, x, y, '', laneNames.index(lane.name)) ### Ya tengo nombre ###
+        vehicle = Vehicle(0, 0, brakeProbability, car, x, y,
+                          laneNames.index(lane.name))  # Ya tengo nombre ###
         lane.vehicleList[0] = vehicle
         lane.add(vehicle)
-        lane.occupiedCells +=1
+        lane.occupiedCells += 1
 
 def setVehicleName(lane):
     flag = False
     name = ''
     namePos = 0
     while(not(flag)):
-        namePos = random.randint(0,lane.vehicleQuantity -1)
+        namePos = random.randint(0, lane.vehicleQuantity - 1)
         if(not(lane.vehicleNames[namePos][1])):
             name = lane.vehicleNames[namePos][0]
             lane.vehicleNames[namePos][1] = True
             flag = True
     return [myfont.render(name, False, (0, 0, 0), blue), name]
 
+
 clock = pygame.time.Clock()
 
-# table = pygame.Surface([200, 25 * (lane.vehicleQuantity + 1)])
 buttons = pygame.Surface([resolution.current_w, (resolution.current_h*10)/100])
 
 def renderButtonTable():
     title = tableFont.render('********** Controls **********', False, green)
-    buttonsText = tableFont.render('S  >>> Start  ||  R  >>> Restart  ||  Space  >>> Pause  ||  X  >>> Exit', False, green)
+    buttonsText = tableFont.render(
+        'S  >>> Start  ||  R  >>> Restart  ||  Space  >>> Pause  ||  X  >>> Exit', False, green)
     #######################################################
-    boardX = (buttons.get_size()[0]* 30) / 100
+    boardX = (buttons.get_size()[0] * 30) / 100
     boardY = buttons.get_size()[1]
     buttons.blit(title, [(resolution.current_w * 5)/100, (boardY*5)/100])
-    buttons.blit(buttonsText, [(resolution.current_w * 5)/100, (boardX*10)/100])
+    buttons.blit(
+        buttonsText, [(resolution.current_w * 5)/100, (boardX*10)/100])
     backgroundImg.blit(buttons, [0, (resolution.current_h*2)/100])
-
-# def renderTable():
-#     table.fill(black)
-#     x = 0
-#     y = 0
-#     cellWidth = 100
-#     ########### HEADER ###########
-#     pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
-#     pygame.draw.rect(table, red, [x+100, y, cellWidth, cellWidth/4], 1)
-#     leftCol = tableFont.render('Car', False, green)
-#     rightCol = tableFont.render('Speed', False, green)
-#     table.blit(leftCol, [(x + 40), (y + 5)])
-#     table.blit(rightCol, [(x + 130), (y + 5)])
-#     y = 25
-#     ##############################
-#     for i in range(0, lane.vehicleQuantity):
-#         pygame.draw.rect(table, red, [x, y, cellWidth, cellWidth/4], 1)
-#         pygame.draw.rect(table, red, [x + 100, y, cellWidth, cellWidth/4], 1)
-#         strName = lane.vehicleNames[i][0]
-#         speedIndex = -1
-
-#         for j in range(0, lane.vehicleQuantity):
-#             vehicle = lane.vehicleList[j]
-#             if(vehicle != None):
-#                 if(lane.vehicleList[j].name == strName):
-#                     speedIndex = j    
-#                     break
-
-#         name = tableFont.render(strName, False, green)
-#         strSpeed = str(lane.vehicleList[speedIndex].speed) if(speedIndex != -1) else 'N/A'
-#         speed = tableFont.render(strSpeed, False, green)
-#         table.blit(name,[(x + 40),(y + 5)])
-#         table.blit(speed,[(x + 140),(y + 5)])
-#         y+=(cellWidth/4)
-#     ###############################
-#     backgroundImg.blit(table, [50, (resolution.current_h*30)/100])
 
 pause = False
 state = 0
 
 def validateLane(lane, x, y):
     if(lane.occupiedCells < lane.vehicleQuantity):
-        createVehicle(lane,x,y) # Crea un nuevo vehiculo
+        createVehicle(lane, x, y)  # Crea un nuevo vehiculo
 
 def _chargeBeforeAndAfter(lane):
-    for i in range(0, len(lane.vehicleList)):
-        vehicle = lane.vehicleList[i]
-        if(vehicle != None):
-            if(vehicle.animation):
-                return True
+    for vehicle in list(filter(None, lane.vehicleList)):
+        if(vehicle.animation):
+            return True
     return False
-
 
 def pushVehicles(y):
     for lane in road.lanes:
-        validateLane(lane, x, round(y,0))
+        validateLane(lane, x, round(y, 0))
         y += 40
 
 start = False
 renderButtonTable()
-screen.blit(backgroundImg, [0,0])
+screen.blit(backgroundImg, [0, 0])
 pygame.display.flip()
 #######################################################
 
 pygame.display.set_caption(appState[state])
 
 while 1:
-    
+
     pygame.event.pump()
 
     for event in pygame.event.get():
@@ -199,11 +180,8 @@ while 1:
             x = 80
             y = (resolution.current_h * 15.8)/100
 
-            # renderTable()
             pushVehicles(y)
             road.update(mode)
-
-            print('listo')
 
             afterPosList = []
 
@@ -212,14 +190,17 @@ while 1:
 
             while(True in afterPosList):
 
-                screen.blit(backgroundImg, [0,0])
+                screen.blit(backgroundImg, [0, 0])
                 laneSprite.draw(screen)
                 laneSprite.update()
-                for i in range(0,len(road.lanes)):
+                for i in range(0, len(road.lanes)):
                     lane = road.lanes[i]
                     lane.update()
-                    lane.draw(screen)
                     afterPosList[i] = _chargeBeforeAndAfter(lane)
+                
+                for lane in road.lanes:
+                    lane.draw(screen)
+
                 pygame.display.update()
                 screen.fill(white)
-                clock.tick(250)
+                # clock.tick(300)
