@@ -1,14 +1,13 @@
-import random, pygame
+import random, pygame, ModelData as data
 
 class Vehicle(pygame.sprite.Sprite):
 
-    def __init__(self,initSpeed, initPosition, brakeProbability, image, xPos, yPos, lane):
+    def __init__(self,initSpeed, initPosition, image, xPos, yPos, lane):
         pygame.sprite.Sprite.__init__(self)
         self.speed = initSpeed
         self.currentPos = initPosition
         self.newPos = 0
         self.checked = False
-        self.brakeProbability = brakeProbability
         self.image = image
         self.xPos = xPos
         self.yPos = yPos
@@ -19,31 +18,32 @@ class Vehicle(pygame.sprite.Sprite):
         self.lane = lane
         self.move = 'X'
 
-    def singleLaneUpdatePosition(self,gap, maxSpeed):
+    def singleLaneUpdatePosition(self,gap):
         self.animation = True
         self.move = 'X'
-        self._ruleOne(maxSpeed)
+        self._ruleOne()
         self._singleLaneRuleTwo(gap)
         self._ruleThree()
         self._ruleFour()
 
-    def multiLaneUpdatePosition(self, gap, gaps, maxSpeed, movement):
+    def multiLaneUpdatePosition(self, gap, gaps, movement):
         self.animation = True
-        self._ruleOne(maxSpeed)
-        self._multiLaneRuleTwo(gap, gaps, maxSpeed, movement)
+        self.checked = True
+        self._ruleOne()
+        self._multiLaneRuleTwo(gap, gaps, movement)
         self._ruleThree()
         self._ruleFour()
 
-    def _ruleOne(self, maxSpeed):
-        self.speed = min(self.speed + 1, maxSpeed)
+    def _ruleOne(self):
+        self.speed = min(self.speed + 1, data.maxSpeed)
     
     def _singleLaneRuleTwo(self, gap):
         self.speed = min(self.speed, gap)
 
-    def _multiLaneRuleTwo(self, gap, gaps, maxSpeed, movement):
+    def _multiLaneRuleTwo(self, gap, gaps, movement):
         self.move = 'X'
         if(self.speed >= gap and movement != 'N/A' and (self.currentPos + self.speed) < 27):
-            if(gaps[0] == maxSpeed and gaps[1] == self.speed):
+            if(gaps[0] == data.maxSpeed and gaps[1] == self.speed):
                 self.changeLane(movement)
             else:
                 self._singleLaneRuleTwo(gap)
@@ -51,7 +51,7 @@ class Vehicle(pygame.sprite.Sprite):
             self._singleLaneRuleTwo(gap)
 
     def _ruleThree(self):
-        if(self.speed > 0 and random.random() <= self.brakeProbability):
+        if(self.speed > 0 and random.random() <= data.breakProbability):
             self.speed -= 1
     
     def _ruleFour(self):
@@ -61,12 +61,12 @@ class Vehicle(pygame.sprite.Sprite):
 
     def changeLane(self, movement):
         if(movement == 'UP'):
-            if(random.random() <= 0.7):
+            if(random.random() <= data.laneChangeProbability):
                 self.lane -= 1
                 self.yPos -= 40
                 self.move = 'Y-'
         elif(movement == 'DOWN'):
-            if(random.random() <= 0.7):
+            if(random.random() <= data.laneChangeProbability):
                 self.lane +=1
                 self.yPos += 40
                 self.move = 'Y+'

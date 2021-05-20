@@ -1,5 +1,5 @@
-import numpy as np
-import pygame
+from Vehicle import Vehicle
+import pygame, random, ModelData as data
 
 class Lane(pygame.sprite.Group):
 
@@ -9,17 +9,25 @@ class Lane(pygame.sprite.Group):
         self.vehicleQuantity = vehicleQuantity
         self.occupiedCells = 0
         self.vehicleList = []
-        self._createInitLane()
+        self.__createInitLane()
         self.name = name
 
-    def _createInitLane(self):
+    def __createInitLane(self):
         self.vehicleList += [None] * self.vehicleQuantity # Lista vacía
+
+    def createVehicle(self, x, y, car):
+        if(self.occupiedCells < self.vehicleQuantity):
+            if(self.vehicleList[0] == None):
+                vehicle = Vehicle(0, 0, car, x, y, data.laneNames.index(self.name))
+                self.vehicleList[0] = vehicle
+                self.add(vehicle)
+                self.occupiedCells += 1
 
     def restartVehicleValues(self):
         for vehicle in list(filter(None, self.vehicleList)):
             vehicle.checked = False
 
-    def checkGap(self, vehicle):
+    def checkVehicleGap(self, vehicle):
         v = self.vehicleList[vehicle.currentPos]
         if(v != vehicle):
             self.occupiedCells -=1
@@ -35,3 +43,9 @@ class Lane(pygame.sprite.Group):
                 else:
                     return end
         return end
+
+    def stillAnimate(self):
+        for vehicle in list(filter(None, self.vehicleList)):
+            if(vehicle.animation):
+                return True
+        return False

@@ -15,7 +15,7 @@ class Road ():
         lane = self.lanes[0]
         for vehicle in list(filter(None, lane.vehicleList)):
             if(not(vehicle.checked)):
-                vehicle.singleLaneUpdatePosition(lane.checkGap(vehicle),lane.maxSpeed)
+                vehicle.singleLaneUpdatePosition(lane.checkVehicleGap(vehicle))
                 lane.vehicleList[vehicle.currentPos] = None
                 if(vehicle.newPos < len(lane.vehicleList)):
                     lane.vehicleList[vehicle.newPos] = vehicle
@@ -31,23 +31,21 @@ class Road ():
             for vehicle in list(filter(None, lane.vehicleList)):
                 if(not(vehicle.checked)):
                     ############ Data for second rule ###########
-                    movement = self.validateSideMovement(vehicle) ## MOVE UP OR DOWN ##
+                    movement = self.__validateSideMovement(vehicle) ## MOVE UP OR DOWN ##
                     gaps = []
                     if(movement == 'UP'):
-                        gaps = [self.backwardGap(lane, vehicle.currentPos), self.forwardGap(self.lanes[vehicle.lane - 1], vehicle.currentPos)]
+                        gaps = [self.__backwardGap(lane, vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane - 1], vehicle.currentPos)]
                     elif(movement == 'DOWN'):
-                        gaps = [self.backwardGap(lane, vehicle.currentPos), self.forwardGap(self.lanes[vehicle.lane + 1], vehicle.currentPos)]
+                        gaps = [self.__backwardGap(lane, vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane + 1], vehicle.currentPos)]
                     #####################################################################
                     currentLane = vehicle.lane ## Carril actual ###
-                    gap = lane.checkGap(vehicle)
-                    vehicle.multiLaneUpdatePosition(gap, gaps,lane.maxSpeed, movement)
+                    vehicle.multiLaneUpdatePosition(lane.checkVehicleGap(vehicle), gaps,movement)
                     if(vehicle.lane == currentLane):
                         movement = 'N/A'
                     lane.vehicleList[vehicle.currentPos] = None
-                    vehicle.checked = True
                     if(movement != 'N/A'):
                         lane.occupiedCells -=1
-                        self._changeLanesVehicle(vehicle)
+                        self.__changeLanesVehicle(vehicle)
                     else:
                         if(vehicle.newPos < len(lane.vehicleList)):
                             lane.vehicleList[vehicle.newPos] = vehicle
@@ -57,7 +55,7 @@ class Road ():
                             vehicle.kill()
             lane.restartVehicleValues()
 
-    def _changeLanesVehicle(self, vehicle):
+    def __changeLanesVehicle(self, vehicle):
         vehicle.kill()
         lane = self.lanes[vehicle.lane]
         vehicle.currentPos = vehicle.newPos ## Actualiza la posicion al nuevo carril ##
@@ -65,10 +63,9 @@ class Road ():
         lane.add(vehicle)
         lane.occupiedCells += 1
 
-    def validateSideMovement(self, vehicle):
+    def __validateSideMovement(self, vehicle):
         moveUp = (vehicle.lane - 1) >= 0
         moveDown = (vehicle.lane + 1) < len(self.lanes)
-        #######################################################
         moves = []
         if(moveUp):
             laneOne = self.lanes[vehicle.lane - 1] ## UP
@@ -85,7 +82,7 @@ class Road ():
         else:
             return 'N/A'
 
-    def forwardGap(self, lane, pos):
+    def __forwardGap(self, lane, pos):
         gap = 0
         if(pos > 0):
             for i in range((pos + 1), len(lane.vehicleList)):
@@ -96,7 +93,7 @@ class Road ():
                     return gap  
         return gap
         
-    def backwardGap(self, lane, pos):
+    def __backwardGap(self, lane, pos):
         gap = 0
         if(pos > 0):
             for i in range((pos - 1), 0, -1): ## 

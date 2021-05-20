@@ -1,161 +1,283 @@
-from Vehicle import Vehicle
-from Lane import Lane
 from Road import Road
-import sched
-import random
-import sys
-import pygame
-import time
+from LaneSprite import LaneSprite
+import Colors, random, sys, pygame, ModelData as data, GraphicResources as gr
 
+########### App Variables ###########
+appStates = ['Nagel-Schreckenberg Model',
+            'Nagel-Schreckenberg Model (Running)', 'Nagel-Schreckenberg Model (Paused)']
+appState = 0
+road = Road()
+clock = pygame.time.Clock()
+#####################################
+
+########### Display Data ###########
 pygame.display.init()
 resolution = pygame.display.Info()
-pygame.display.set_mode(
-    (resolution.current_w, int((resolution.current_h * 90)/100)))
-
-vehicleQuantity = 3
-mode = 'multi'
-# mode = 'single'
-
 size = width, height = resolution.current_w, resolution.current_h
-black = [0, 0, 0]
-white = [255, 255, 255]
-red = [255, 0, 0]
-blue = [204, 255, 255]
-green = [0, 255, 0]
-
-backgroundImg = pygame.image.load('./screen/background.jpg')
-backgroundImg = pygame.transform.scale(
-    backgroundImg, [resolution.current_w, resolution.current_h])
-
-appState = ['Nagel-Schreckenberg Model',
-            'Nagel-Schreckenberg Model (Running)', 'Nagel-Schreckenberg Model (Paused)']
-
-pygame.display.set_caption(appState[1])
+pygame.display.set_mode((width, int((height * 90)/100)))
+pygame.display.set_caption(appStates[appState])
 screen = pygame.display.set_mode(size)
 pygame.font.init()
 myfont = pygame.font.SysFont('Arial', 12)
 tableFont = pygame.font.SysFont('Arial', 15)
+####################################
 
-road = Road()
-laneNames = []
+###### Loading Graphic Resources ######
+gr.backgroundImg = pygame.transform.scale(gr.backgroundImg, [width, height])
+gr.chargeCarImages()
+#######################################
 
-for i in range(vehicleQuantity):
-    laneNames.append("L" + str(i))
-
-for i in range(0, vehicleQuantity):
-    lane = Lane(28, 5, laneNames[i])
-    road.lanes.append(lane)
-########################################################
-brakeProbability = 0.3
-########################################################
-
-
-class LaneSprite(pygame.sprite.Sprite):
-
-    def __init__(self, image, xPos, yPos):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image
-        self.rect = image.get_rect()
-        self.rect.x = xPos
-        self.rect.y = yPos
-########################################################
-
-
-laneBackGround = pygame.image.load('./screen/nagelModelLane.png')
-laneX = 70
-laneY = (resolution.current_h * 15)/100
-
-laneSprite = pygame.sprite.Group()
-
-for _ in range(0, vehicleQuantity):
-    laneSprite1 = LaneSprite(laneBackGround, laneX, laneY)
-    laneY += 40
-    laneSprite.add(laneSprite1)
-
-########################################################
-carImages = ['./screen/car1.png', './screen/car2.png',
-             './screen/car3.png', './screen/car4.png', './screen/car5.png']
-width = 70
-height = 50
-########################################################
-images = []
-
-
-def chargeImages():
-    for i in range(0, len(carImages)):
-        car = pygame.image.load(carImages[i]).convert_alpha()
-        car = pygame.transform.scale(car, (38, 28))
-        images.append(car)
-
-
-chargeImages()
-
-
-def createVehicle(lane, x, y):
-    if(lane.vehicleList[0] == None):
-        imagePos = random.randint(0, 4)
-        car = images[imagePos].copy()
-        #########################################################
-        vehicle = Vehicle(0, 0, brakeProbability, car, x, y,
-                          laneNames.index(lane.name))  # Ya tengo nombre ###
-        lane.vehicleList[0] = vehicle
-        lane.add(vehicle)
-        lane.occupiedCells += 1
-
-def setVehicleName(lane):
-    flag = False
-    name = ''
-    namePos = 0
-    while(not(flag)):
-        namePos = random.randint(0, lane.vehicleQuantity - 1)
-        if(not(lane.vehicleNames[namePos][1])):
-            name = lane.vehicleNames[namePos][0]
-            lane.vehicleNames[namePos][1] = True
-            flag = True
-    return [myfont.render(name, False, (0, 0, 0), blue), name]
-
-
-clock = pygame.time.Clock()
-
-buttons = pygame.Surface([resolution.current_w, (resolution.current_h*10)/100])
-
-def renderButtonTable():
-    title = tableFont.render('********** Controls **********', False, green)
-    buttonsText = tableFont.render(
-        'S  >>> Start  ||  R  >>> Restart  ||  Space  >>> Pause  ||  X  >>> Exit', False, green)
-    #######################################################
-    boardX = (buttons.get_size()[0] * 30) / 100
-    boardY = buttons.get_size()[1]
-    buttons.blit(title, [(resolution.current_w * 5)/100, (boardY*5)/100])
-    buttons.blit(
-        buttonsText, [(resolution.current_w * 5)/100, (boardX*10)/100])
-    backgroundImg.blit(buttons, [0, (resolution.current_h*2)/100])
-
-pause = False
-state = 0
-
-def validateLane(lane, x, y):
-    if(lane.occupiedCells < lane.vehicleQuantity):
-        createVehicle(lane, x, y)  # Crea un nuevo vehiculo
-
-def _chargeBeforeAndAfter(lane):
-    for vehicle in list(filter(None, lane.vehicleList)):
-        if(vehicle.animation):
-            return True
-    return False
-
-def pushVehicles(y):
-    for lane in road.lanes:
-        validateLane(lane, x, round(y, 0))
-        y += 40
-
+########## CONTROLS ##########
+buttonsPanel = pygame.Surface([width/2, (height*10)/100])
 start = False
-renderButtonTable()
-screen.blit(backgroundImg, [0, 0])
-pygame.display.flip()
-#######################################################
+pause = False
+data.mode = 'multi'
 
-pygame.display.set_caption(appState[state])
+def __renderButtonTable():
+    title = tableFont.render('********** Controls **********', False, Colors.green)
+    buttonsText = tableFont.render('S  >>> Start  ||  F  >>> Stop   ||  Space  >>> Pause  ||  X  >>> Exit', False, Colors.green)
+    boardX = (buttonsPanel.get_size()[0] * 30) / 100
+    boardY = buttonsPanel.get_size()[1]
+    buttonsPanel.blit(title, [(width * 5)/100, (boardY*5)/100])
+    buttonsPanel.blit(buttonsText, [(width * 5)/100, (boardY*50)/100])
+    gr.backgroundImg.blit(buttonsPanel, [0, (height*2)/100])
+
+__renderButtonTable()
+################################################
+
+########## MODEL DATA ##########
+dataPanel = pygame.Surface([width/2, (height*10)/100])
+strPercentage = '%'
+
+####### MODE #######
+modeText = tableFont.render('>>> Mode ', False, Colors.green)
+
+singleBtn = pygame.image.load('./resources/single_btn.jpg')
+# singleBtn = pygame.transform.scale(singleBtn, (50, 15))
+single_rect = singleBtn.get_rect()
+single_rect.x = (width*5)/100
+single_rect.y = (((height*10)/100) * 11) /100
+
+multiBtn = pygame.image.load('./resources/multi_btn.jpg')
+
+data.selectedButton = singleBtn
+
+####### LANE QUANTITY SELECTOR #######
+strLaneQuantity = '2'
+lQuantityText = tableFont.render('>>> Lane Quantity ', False, Colors.green)
+lQuantityValue = tableFont.render(strLaneQuantity, False, Colors.green)
+
+### -----> Lane selector Buttons ###
+ls_plusBtn = pygame.image.load('./resources/plus.jpg')
+ls_plusBtn = pygame.transform.scale(ls_plusBtn, (15, 15))
+ls_plusBtn_rect = ls_plusBtn.get_rect()
+ls_plusBtn_rect.x = (width*21)/100
+ls_plusBtn_rect.y = (((height*10)/100) * 14) /100
+
+ls_minusBtn = pygame.image.load('./resources/minus.jpg')
+ls_minusBtn = pygame.transform.scale(ls_minusBtn, (15, 15))
+ls_minusBtn_rect = ls_minusBtn.get_rect()
+ls_minusBtn_rect.x = (width*23)/100
+ls_minusBtn_rect.y = (((height*10)/100) * 14) /100
+################################################
+
+####### BREAK PROBABILITY SELECTOR #######
+data.strBreakProbability = '0'
+breakProbabilityText = tableFont.render('>>> Break Probability ', False, Colors.green)
+breakProbabilityValue = tableFont.render(data.strBreakProbability + strPercentage, False, Colors.green)
+
+### -----> break probability Buttons ###
+bp_plusBtn = ls_plusBtn.copy()
+bp_plusBtn_rect = bp_plusBtn.get_rect()
+bp_plusBtn_rect.x = (width*13)/100
+bp_plusBtn_rect.y = (((height*10)/100) * 54) /100
+
+bp_minusBtn = ls_minusBtn.copy()
+bp_minusBtn_rect = bp_minusBtn.get_rect()
+bp_minusBtn_rect.x = (width*15)/100
+bp_minusBtn_rect.y = (((height*10)/100) * 54) /100
+################################################
+
+####### CHANGE PROBABILITY SELECTOR #######
+data.strChangeProbability = '20'
+changeProbabilityText = tableFont.render('>>> Lane Change Probability ', False, Colors.green)
+changeProbabilityValue = tableFont.render(data.strChangeProbability + strPercentage, False, Colors.green)
+
+### -----> change probability Buttons ###
+cg_plusBtn = ls_plusBtn.copy()
+cg_plusBtn_rect = cg_plusBtn.get_rect()
+cg_plusBtn_rect.x = (width*34.5)/100
+cg_plusBtn_rect.y = (((height*10)/100) * 54) /100
+
+cg_minusBtn = ls_minusBtn.copy()
+cg_minusBtn_rect = cg_minusBtn.get_rect()
+cg_minusBtn_rect.x = (width*36.5)/100
+cg_minusBtn_rect.y = (((height*10)/100) * 54) /100
+################################################
+def __blitModeButton(option):
+    if(option == 'mode'):
+        data.strBreakProbability = '0'
+        data.strChangeProbability = '20'
+        if(data.mode == 'multi'):
+            data.laneQuantity = 1
+            data.breakProbability = 0
+            data.laneChangeProbability = 0
+            data.hideLaneSelector = True
+            data.mode = 'single'
+            data.selectedButton = singleBtn
+        else:
+            data.laneQuantity = 2
+            data.breakProbability = 0
+            data.laneChangeProbability = 0.2
+            strLaneQuantity = '2'
+            data.hideLaneSelector = False
+            data.mode = 'multi'
+            data.selectedButton = multiBtn
+    dataPanel.blit(data.selectedButton, [single_rect.x, single_rect.y])
+
+def __renderLaneQuantitySelector(boardX, boardY):
+    ### Minus Button ###
+    dataPanel.blit(ls_minusBtn, [ls_minusBtn_rect.x,ls_minusBtn_rect.y])
+    #############################################
+    ### Minus Button ###
+    dataPanel.blit(ls_plusBtn, [ls_plusBtn_rect.x, ls_plusBtn_rect.y])
+    #############################################
+    boardX = (width*19)/100
+    lQuantityValue = tableFont.render(strLaneQuantity, False, Colors.green)
+    dataPanel.blit(lQuantityValue, [boardX, boardY])
+
+def __renderBreakProbabilitySelector(boardX, boardY):
+    ### Minus Button ###
+    dataPanel.blit(bp_minusBtn, [bp_minusBtn_rect.x, bp_minusBtn_rect.y])
+    #############################################
+    ### Minus Button ###
+    dataPanel.blit(bp_plusBtn, [bp_plusBtn_rect.x, bp_plusBtn_rect.y])
+    #############################################
+    boardX = (width*10.5)/100
+    boardY = (((height*10)/100) * 54) /100
+    breakProbabilityValue = tableFont.render(data.strBreakProbability + strPercentage, False, Colors.green)
+    dataPanel.blit(breakProbabilityValue, [boardX, boardY])
+
+def __renderChangeProbabilitySelector(boardX, boardY):
+    ### Minus Button ###
+    dataPanel.blit(cg_minusBtn, [cg_minusBtn_rect.x, cg_minusBtn_rect.y])
+    #############################################
+    ### Minus Button ###
+    dataPanel.blit(cg_plusBtn, [cg_plusBtn_rect.x, cg_plusBtn_rect.y])
+    #############################################
+    boardX = (width*31.5)/100
+    boardY = (((height*10)/100) * 54) /100
+    changeProbabilityValue = tableFont.render(data.strChangeProbability + strPercentage, False, Colors.green)
+    dataPanel.blit(changeProbabilityValue, [boardX, boardY])
+
+def __renderModeComponent():
+    dataPanel.fill(Colors.black)
+    ## Mode Label ##
+    boardX = 0
+    boardY = (dataPanel.get_size()[1] * 55) /100
+    dataPanel.blit(breakProbabilityText, [boardX, boardY])
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    dataPanel.blit(modeText, [boardX, boardY])
+    __blitModeButton('mode')
+    #################
+    if(not(data.hideLaneSelector)):
+        boardX = (width*10.5)/100
+        dataPanel.blit(lQuantityText, [boardX, boardY])
+        __renderLaneQuantitySelector(boardX, boardY)
+        boardX = (width*18)/100
+        boardY = (dataPanel.get_size()[1] * 54) /100
+        dataPanel.blit(changeProbabilityText, [boardX, boardY])
+        __renderChangeProbabilitySelector(boardX, boardY)
+    #################
+    __renderBreakProbabilitySelector(boardX, boardY)
+    gr.backgroundImg.blit(dataPanel, [(width * 50)/100, (height*2)/100])
+    screen.blit(gr.backgroundImg, [0, 0])
+    pygame.display.update()
+
+__renderModeComponent()
+
+def __breakProbabilityComponent():
+    dataPanel.fill(Colors.black)
+    ## Mode Label ##
+    boardX = 0
+    boardY = (dataPanel.get_size()[1] * 55) /100
+    dataPanel.blit(breakProbabilityText, [boardX, boardY])
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    dataPanel.blit(modeText, [boardX, boardY])
+    __blitModeButton('')
+    #################
+    if(not(data.hideLaneSelector)):
+        boardX = (width*10.5)/100
+        dataPanel.blit(lQuantityText, [boardX, boardY])
+        __renderLaneQuantitySelector(boardX, boardY)
+        boardX = (width*18)/100
+        boardY = (dataPanel.get_size()[1] * 54) /100
+        dataPanel.blit(changeProbabilityText, [boardX, boardY])
+        __renderChangeProbabilitySelector(boardX, boardY)
+    #################
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    __renderBreakProbabilitySelector(boardX, boardY)
+    gr.backgroundImg.blit(dataPanel, [(width * 50)/100, (height*2)/100])
+    screen.blit(gr.backgroundImg, [0, 0])
+    pygame.display.update()
+
+def __renderLaneQuantityComponent():
+    dataPanel.fill(Colors.black)
+    ## Mode Label ##
+    boardX = 0
+    boardY = (dataPanel.get_size()[1] * 55) /100
+    dataPanel.blit(breakProbabilityText, [boardX, boardY])
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    dataPanel.blit(modeText, [boardX, boardY])
+    __blitModeButton('')
+    #################
+    if(not(data.hideLaneSelector)):
+        boardX = (width*10.5)/100
+        dataPanel.blit(lQuantityText, [boardX, boardY])
+        __renderLaneQuantitySelector(boardX, boardY)
+        boardX = (width*18)/100
+        boardY = (dataPanel.get_size()[1] * 54) /100
+        dataPanel.blit(changeProbabilityText, [boardX, boardY])
+        __renderChangeProbabilitySelector(boardX, boardY)
+    #################
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    __renderBreakProbabilitySelector(boardX, (dataPanel.get_size()[1] * 55) /100)
+    gr.backgroundImg.blit(dataPanel, [(width * 50)/100, (height*2)/100])
+    screen.blit(gr.backgroundImg, [0, 0])
+    pygame.display.update()
+
+def __changeProbabilityComponent():
+    dataPanel.fill(Colors.black)
+    ## Mode Label ##
+    boardX = 0
+    boardY = (dataPanel.get_size()[1] * 55) /100
+    dataPanel.blit(breakProbabilityText, [boardX, boardY])
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    dataPanel.blit(modeText, [boardX, boardY])
+    __blitModeButton('')
+    #################
+    if(not(data.hideLaneSelector)):
+        boardX = (width*10.5)/100
+        dataPanel.blit(lQuantityText, [boardX, boardY])
+        __renderLaneQuantitySelector(boardX, boardY)
+        boardX = (width*18)/100
+        boardY = (dataPanel.get_size()[1] * 54) /100
+        dataPanel.blit(changeProbabilityText, [boardX, boardY])
+        __renderChangeProbabilitySelector(boardX, boardY)
+    #################
+    boardY = (dataPanel.get_size()[1] * 12) /100
+    __renderBreakProbabilitySelector(boardX, boardY)
+    gr.backgroundImg.blit(dataPanel, [(width * 50)/100, (height*2)/100])
+    screen.blit(gr.backgroundImg, [0, 0])
+    pygame.display.update()
+################################################
+
+def __pushVehicles(y):
+    for lane in road.lanes:
+        imagePos = random.randint(0, 4)
+        car = gr.images[imagePos].copy()
+        lane.createVehicle(x, round(y, 0), car)
+        y += 40
 
 while 1:
 
@@ -167,40 +289,104 @@ while 1:
                 sys.exit()
             elif(event.key == pygame.K_SPACE):
                 pause = not(pause)
-                state = 2 if(state == 1) else 1
+                appState = 2 if(appState == 1) else 1
             elif(event.key == pygame.K_s):
-                start = True
-                state = 1
-            pygame.display.set_caption(appState[state])
-
+                if(not(start)):
+                    start = True
+                    appState = 1
+                    gr.createLaneSprites(height)
+                    data.createLanes(road)  
+            pygame.display.set_caption(appStates[appState])
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if(not(start)):
+                mpos = pygame.mouse.get_pos() # Get mouse position
+                if single_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __renderModeComponent()
+                elif bp_minusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(data.strBreakProbability)
+                    if(value > 0):
+                        value -= 5
+                    data.breakProbability = value/100
+                    data.strBreakProbability = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __breakProbabilityComponent()
+                elif bp_plusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(data.strBreakProbability)
+                    if(value < 75):
+                        value += 5
+                    data.breakProbability = value/100
+                    data.strBreakProbability = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __breakProbabilityComponent()
+                elif ls_minusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(strLaneQuantity)
+                    if(value > 2):
+                        value -= 1
+                    data.laneQuantity = value
+                    strLaneQuantity = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __renderLaneQuantityComponent()
+                elif ls_plusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(strLaneQuantity)
+                    if(value < 5):
+                        value += 1
+                    data.laneQuantity = value
+                    strLaneQuantity = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __renderLaneQuantityComponent()
+                elif cg_minusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(data.strChangeProbability)
+                    if(value > 20):
+                        value -= 5
+                    data.laneChangeProbability = value/100
+                    data.strChangeProbability = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __changeProbabilityComponent()
+                elif cg_plusBtn_rect.collidepoint([mpos[0] - (width* 50)/100, mpos[1] - (height * 2)/100]):
+                    value = int(data.strChangeProbability)
+                    if(value < 80):
+                        value += 5
+                    data.laneChangeProbability = value/100
+                    data.strChangeProbability = str(value)
+                    screen.fill(Colors.white)
+                    __renderButtonTable()
+                    __changeProbabilityComponent()
+            
     if(start):
 
         if(not(pause)):
 
             x = 80
-            y = (resolution.current_h * 15.8)/100
+            y = (height * 15.8)/100
 
-            pushVehicles(y)
-            road.update(mode)
+            __pushVehicles(y)
+            road.update(data.mode)
 
-            afterPosList = []
+            animatedLanes = []
 
             for lane in road.lanes:
-                afterPosList.append(_chargeBeforeAndAfter(lane))
+                animatedLanes.append(lane.stillAnimate())
 
-            while(True in afterPosList):
+            while(True in animatedLanes):
 
-                screen.blit(backgroundImg, [0, 0])
-                laneSprite.draw(screen)
-                laneSprite.update()
+                screen.blit(gr.backgroundImg, [0, 0])
+                gr.laneSprites.draw(screen)
+                gr.laneSprites.update()
                 for i in range(0, len(road.lanes)):
                     lane = road.lanes[i]
                     lane.update()
-                    afterPosList[i] = _chargeBeforeAndAfter(lane)
-                
+                    animatedLanes[i] = lane.stillAnimate()
+
                 for lane in road.lanes:
                     lane.draw(screen)
 
                 pygame.display.update()
-                screen.fill(white)
-                # clock.tick(300)
+                screen.fill(Colors.white)
+                clock.tick(300)
