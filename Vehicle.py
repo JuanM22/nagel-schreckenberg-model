@@ -74,19 +74,19 @@ class Vehicle(pygame.sprite.Sprite):
     def update(self):
         if(self.move == 'X'):
             if(self.rect.x < self.xPos):
-                self.rect.x += 1
+                self.rect.x += 2
             else:
                 self.animation = False
                 self.move = ''
         elif(self.move == 'Y+'):
             if(self.rect.y < self.yPos):
-                self.rect.y +=1
+                self.rect.y += 2
             else:
                 self.animation = (self.rect.x < self.xPos)
                 self.move = '' if(not(self.animation)) else 'X'
         elif(self.move == 'Y-'):
             if(self.rect.y > self.yPos):
-                self.rect.y -=1
+                self.rect.y -= 2
             else:
                 self.animation = (self.rect.x < self.xPos)
                 self.move = '' if(not(self.animation)) else 'X'

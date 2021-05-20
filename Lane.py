@@ -3,9 +3,8 @@ import pygame, random, ModelData as data
 
 class Lane(pygame.sprite.Group):
 
-    def __init__(self,vehicleQuantity, maxSpeed, name):
+    def __init__(self,vehicleQuantity, name):
         pygame.sprite.Group.__init__(self)
-        self.maxSpeed = maxSpeed
         self.vehicleQuantity = vehicleQuantity
         self.occupiedCells = 0
         self.vehicleList = []

@@ -1,12 +1,19 @@
 from Lane import Lane
 
-strChangeProbability = '20'
-strBreakProbability = '0'
+start = False
+pause = False
+appState = 0
 
-laneChangeProbability = 0
-breakProbability = 0
+strChangeProbability = '70'
+strBreakProbability = '30'
+strMaxSpeed = '5'
+strLaneQuantity = '1'
+strVehicleQuantity = '10'
+
+laneChangeProbability = 0.7
+breakProbability = 0.3
 laneQuantity = 1
-vehicleQuantity = 28
+vehicleQuantity = 10
 maxSpeed = 5
 mode = ''
 hideLaneSelector = True
@@ -21,5 +28,5 @@ def chargeLaneNames():
 def createLanes(road):
     laneNames = chargeLaneNames()
     for i in range(0, laneQuantity):
-        lane = Lane(28, 5, laneNames[i])
+        lane = Lane(28, laneNames[i])
         road.lanes.append(lane)

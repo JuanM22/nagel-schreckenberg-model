@@ -15,6 +15,8 @@ laneSprites = pygame.sprite.Group()
 laneBackGround = pygame.image.load('./resources/nagelModelLane.png')
 
 def createLaneSprites(height):
+    laneSprites.empty()
+    laneSprites.update()
     ######################################################################
     laneXPos = 70
     laneYPos = (height * 15)/100
