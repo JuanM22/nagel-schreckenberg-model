@@ -338,41 +338,45 @@ while 1:
                     __renderButtonTable()
                     __renderModeComponent('')
                 elif ls_minusBtn_rect.collidepoint([mpos[0] - (width* 35)/100, mpos[1] - (height * 2)/100]):
-                    value = int(data.strLaneQuantity)
-                    if(value > 2):
-                        value -= 1
-                    data.laneQuantity = value
-                    data.strLaneQuantity = str(value)
-                    screen.fill(Colors.white)
-                    __renderButtonTable()
-                    __renderModeComponent('')
+                    if(data.mode == 'multi'):
+                        value = int(data.strLaneQuantity)
+                        if(value > 2):
+                            value -= 1
+                        data.laneQuantity = value
+                        data.strLaneQuantity = str(value)
+                        screen.fill(Colors.white)
+                        __renderButtonTable()
+                        __renderModeComponent('')
                 elif ls_plusBtn_rect.collidepoint([mpos[0] - (width* 35)/100, mpos[1] - (height * 2)/100]):
-                    value = int(data.strLaneQuantity)
-                    if(value < 5):
-                        value += 1
-                    data.laneQuantity = value
-                    data.strLaneQuantity = str(value)
-                    screen.fill(Colors.white)
-                    __renderButtonTable()
-                    __renderModeComponent('')
+                    if(data.mode == 'multi'):
+                        value = int(data.strLaneQuantity)
+                        if(value < 5):
+                            value += 1
+                        data.laneQuantity = value
+                        data.strLaneQuantity = str(value)
+                        screen.fill(Colors.white)
+                        __renderButtonTable()
+                        __renderModeComponent('')
                 elif cg_minusBtn_rect.collidepoint([mpos[0] - (width* 35)/100, mpos[1] - (height * 2)/100]):
-                    value = int(data.strChangeProbability)
-                    if(value > 20):
-                        value -= 5
-                    data.laneChangeProbability = value/100
-                    data.strChangeProbability = str(value)
-                    screen.fill(Colors.white)
-                    __renderButtonTable()
-                    __renderModeComponent('')
+                    if(data.mode == 'multi'):
+                        value = int(data.strChangeProbability)
+                        if(value > 20):
+                            value -= 5
+                        data.laneChangeProbability = value/100
+                        data.strChangeProbability = str(value)
+                        screen.fill(Colors.white)
+                        __renderButtonTable()
+                        __renderModeComponent('')
                 elif cg_plusBtn_rect.collidepoint([mpos[0] - (width* 35)/100, mpos[1] - (height * 2)/100]):
-                    value = int(data.strChangeProbability)
-                    if(value < 80):
-                        value += 5
-                    data.laneChangeProbability = value/100
-                    data.strChangeProbability = str(value)
-                    screen.fill(Colors.white)
-                    __renderButtonTable()
-                    __renderModeComponent('')
+                    if(data.mode == 'multi'):
+                        value = int(data.strChangeProbability)
+                        if(value < 80):
+                            value += 5
+                        data.laneChangeProbability = value/100
+                        data.strChangeProbability = str(value)
+                        screen.fill(Colors.white)
+                        __renderButtonTable()
+                        __renderModeComponent('')
                 elif mx_minusBtn_rect.collidepoint([mpos[0] - (width* 35)/100, mpos[1] - (height * 2)/100]):
                     value = int(data.strMaxSpeed)
                     if(value > 3):
@@ -440,4 +444,4 @@ while 1:
 
                 pygame.display.update()
                 screen.fill(Colors.white)
-                clock.tick(350)
+                clock.tick(300)

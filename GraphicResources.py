@@ -13,7 +13,7 @@ backgroundImg = backgroundImg = pygame.image.load('./resources/nagelBackground.j
 
 ### LANES ###
 laneSprites = pygame.sprite.Group()
-laneBackGround = pygame.image.load('./resources/nagelModelLane.png')
+laneBackGround = pygame.image.load('./resources/nagelModelLane.jpg')
 
 def createLaneSprites(height):
     laneSprites.empty()

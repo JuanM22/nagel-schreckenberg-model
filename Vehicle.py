@@ -47,7 +47,7 @@ class Vehicle(pygame.sprite.Sprite):
                 currentLane = self.lane
                 self.changeLane(movement)
                 if(currentLane == self.lane):
-                    self.__singleLaneRuleTwo()
+                    self.__singleLaneRuleTwo(gap)
             else:
                 self.__singleLaneRuleTwo(gap)
         else:
