@@ -2,12 +2,13 @@ import pygame
 import ModelData as data
 from LaneSprite import LaneSprite
 
-carImages = ['./resources/car1.png', './resources/car2.png',
-             './resources/car3.png', './resources/car4.png', './resources/car5.png']
+carImages = ['./resources/car1.png', './resources/car2.png', './resources/car3.png', 
+             './resources/car4.png', './resources/car5.png', './resources/car6.png',
+             './resources/car7.png', './resources/car8.png', './resources/car9.png']
 images = []
 
 ### SCREEN ###
-backgroundImg = backgroundImg = pygame.image.load('./resources/background.jpg')
+backgroundImg = backgroundImg = pygame.image.load('./resources/nagelBackground.jpg')
 #############################################################################
 
 ### LANES ###
@@ -19,7 +20,7 @@ def createLaneSprites(height):
     laneSprites.update()
     ######################################################################
     laneXPos = 70
-    laneYPos = (height * 15)/100
+    laneYPos = (height * 30)/100
     for _ in range(0, data.laneQuantity):
         laneSprite = LaneSprite(laneBackGround, laneXPos, laneYPos)
         laneYPos += 40

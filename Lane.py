@@ -27,10 +27,6 @@ class Lane(pygame.sprite.Group):
             vehicle.checked = False
 
     def checkVehicleGap(self, vehicle):
-        v = self.vehicleList[vehicle.currentPos]
-        if(v != vehicle):
-            self.occupiedCells -=1
-            v.kill()
         start = vehicle.currentPos + 1
         end = 0
         if(start == len(self.vehicleList)):

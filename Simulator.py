@@ -49,12 +49,12 @@ strPercentage = '%'
 ####### MODE #######
 modeText = tableFont.render('>>> Mode ', False, Colors.green)
 
-singleBtn = pygame.image.load('./resources/single_btn.jpg')
+singleBtn = pygame.image.load('./resources/single_btn.png')
 single_rect = singleBtn.get_rect()
 single_rect.x = (width*5)/100
 single_rect.y = (((height*10)/100) * 11) /100
 
-multiBtn = pygame.image.load('./resources/multi_btn.jpg')
+multiBtn = pygame.image.load('./resources/multi_btn.png')
 
 data.selectedButton = singleBtn
 
@@ -63,14 +63,14 @@ maxSpeedText = tableFont.render('>>> Max Speed ', False, Colors.green)
 maxSpeedValue = tableFont.render(data.strMaxSpeed, False, Colors.green)
 
 ### -----> max speed Buttons ###
-mx_plusBtn = pygame.image.load('./resources/plus.jpg')
-mx_plusBtn = pygame.transform.scale(mx_plusBtn, (15, 15))
+mx_plusBtn = pygame.image.load('./resources/plus.png')
+mx_plusBtn = pygame.transform.scale(mx_plusBtn, (20, 20))
 mx_plusBtn_rect = mx_plusBtn.get_rect()
 mx_plusBtn_rect.x = (width*21)/100
 mx_plusBtn_rect.y = (((height*10)/100) * 14) /100
 
-mx_minusBtn = pygame.image.load('./resources/minus.jpg')
-mx_minusBtn = pygame.transform.scale(mx_minusBtn, (15, 15))
+mx_minusBtn = pygame.image.load('./resources/minus.png')
+mx_minusBtn = pygame.transform.scale(mx_minusBtn, (20, 20))
 mx_minusBtn_rect = mx_minusBtn.get_rect()
 mx_minusBtn_rect.x = (width*23)/100
 mx_minusBtn_rect.y = (((height*10)/100) * 14) /100
@@ -277,7 +277,7 @@ def __showSelectedData():
 
 def __pushVehicles(y):
     for lane in road.lanes:
-        imagePos = random.randint(0, 4)
+        imagePos = random.randint(0, 8)
         car = gr.images[imagePos].copy()
         lane.createVehicle(x, round(y, 0), car)
         y += 40
@@ -415,7 +415,7 @@ while 1:
         if(not(data.pause)):
 
             x = 80
-            y = (height * 15.8)/100
+            y = (height * 30.8)/100
 
             __pushVehicles(y)
             road.update(data.mode)
@@ -440,4 +440,4 @@ while 1:
 
                 pygame.display.update()
                 screen.fill(Colors.white)
-                clock.tick(120)
+                clock.tick(350)
