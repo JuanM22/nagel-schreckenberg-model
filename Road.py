@@ -34,9 +34,9 @@ class Road ():
                     movement = self.__validateSideMovement(vehicle) ## MOVE UP OR DOWN ##
                     gaps = []
                     if(movement == 'UP'):
-                        gaps = [self.__backwardGap(lane, vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane - 1], vehicle.currentPos)]
+                        gaps = [self.__backwardGap(self.lanes[vehicle.lane - 1], vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane - 1], vehicle.currentPos)]
                     elif(movement == 'DOWN'):
-                        gaps = [self.__backwardGap(lane, vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane + 1], vehicle.currentPos)]
+                        gaps = [self.__backwardGap(self.lanes[vehicle.lane + 1], vehicle.currentPos), self.__forwardGap(self.lanes[vehicle.lane + 1], vehicle.currentPos)]
                     #####################################################################
                     currentLane = vehicle.lane ## Carril actual ###
                     vehicle.multiLaneUpdatePosition(lane.checkVehicleGap(vehicle), gaps,movement)
