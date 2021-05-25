@@ -54,8 +54,9 @@ class Vehicle(pygame.sprite.Sprite):
             self.__singleLaneRuleTwo(gap)
 
     def _ruleThree(self):
-        if(self.speed > 0 and random.random() <= data.breakProbability):
-            self.speed -= 1
+        if(data.breakProbability > 0):
+            if(self.speed > 0 and random.random() <= data.breakProbability):
+                self.speed -= 1
     
     def _ruleFour(self):
         self.newPos = self.currentPos + self.speed

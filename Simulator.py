@@ -32,7 +32,7 @@ data.mode = 'multi'
 
 def __renderButtonTable():
     title = tableFont.render('********** Controls **********', False, Colors.green)
-    buttonsText = tableFont.render('S  >>> Start  ||  F  >>> Stop   ||  Space  >>> Pause  ||  X  >>> Exit', False, Colors.green)
+    buttonsText = tableFont.render('S  >>> Start  ||  Space  >>> Pause  ||  X  >>> Exit', False, Colors.green)
     boardX = (buttonsPanel.get_size()[0] * 30) / 100
     boardY = buttonsPanel.get_size()[1]
     buttonsPanel.blit(title, [(width * 5)/100, (boardY*5)/100])
@@ -282,14 +282,6 @@ def __pushVehicles(y):
         lane.createVehicle(x, round(y, 0), car)
         y += 40
 
-def __restartData():
-    data.hideLaneSelector = True
-    data.start = data.pause = False
-    data.mode = 'multi'
-    data.appState = 0
-    road.lanes = []
-    __renderModeComponent('mode')
-
 while 1:
 
     pygame.event.pump()
@@ -308,9 +300,6 @@ while 1:
                     gr.createLaneSprites(height)
                     data.createLanes(road)  
                     __showSelectedData()
-            elif(event.key == pygame.K_f):
-                if(data.start):
-                    __restartData()
             pygame.display.set_caption(appStates[data.appState])
         if event.type == pygame.MOUSEBUTTONDOWN:
             if(not(data.start)):
