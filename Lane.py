@@ -5,17 +5,16 @@ class Lane(pygame.sprite.Group):
 
     def __init__(self,vehicleQuantity, name):
         pygame.sprite.Group.__init__(self)
-        self.vehicleQuantity = vehicleQuantity
         self.occupiedCells = 0
         self.vehicleList = []
         self.__createInitLane()
         self.name = name
 
     def __createInitLane(self):
-        self.vehicleList += [None] * self.vehicleQuantity # Lista vacía
+        self.vehicleList += [None] * 28 # Lista vacía
 
     def createVehicle(self, x, y, car):
-        if(self.occupiedCells < self.vehicleQuantity):
+        if(self.occupiedCells < data.vehicleQuantity):
             if(self.vehicleList[0] == None):
                 vehicle = Vehicle(0, 0, car, x, y, data.laneNames.index(self.name))
                 self.vehicleList[0] = vehicle
