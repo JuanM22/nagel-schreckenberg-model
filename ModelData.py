@@ -28,5 +28,5 @@ def chargeLaneNames():
 def createLanes(road):
     laneNames = chargeLaneNames()
     for i in range(0, laneQuantity):
-        lane = Lane(28, laneNames[i])
+        lane = Lane(laneNames[i])
         road.lanes.append(lane)
